@@ -1,45 +1,28 @@
 @echo off
-title Windows Disk Optimization Script
-color 0A
+title Auto Backup Disk D to ZIP (Downloads)
+color 0B
+
+:: ====== CONFIG ======
+set SOURCE=D:
+set DEST=%USERPROFILE%\Downloads
+set DATE=%DATE:~10,4%-%DATE:~4,2%-%DATE:~7,2%
+set ZIPNAME=Backup_D_%DATE%.zip
+:: ====================
 
 echo =========================================
-echo  WINDOWS DISK OPTIMIZATION (SAFE MODE)
-echo  Target: Disk 90-100%%
+echo   AUTO BACKUP DISK D TO ZIP
+echo   DESTINATION: Downloads
 echo =========================================
 echo.
-pause
 
-:: Disable Superfetch / SysMain
-echo [1/6] Disabling Superfetch (SysMain)...
-sc stop "SysMain" >nul 2>&1
-sc config "SysMain" start= disabled >nul 2>&1
-
-:: Disable Windows Search
-echo [2/6] Disabling Windows Search...
-sc stop "WSearch" >nul 2>&1
-sc config "WSearch" start= disabled >nul 2>&1
-
-:: Disable Background Apps (Windows 8.1 safe)
-echo [3/6] Disabling background apps...
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" /v GlobalUserDisabled /t REG_DWORD /d 1 /f >nul
-
-:: Reduce Visual Effects
-echo [4/6] Optimizing visual effects...
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 2 /f >nul
-
-:: Clear Temp Files
-echo [5/6] Cleaning temporary files...
-del /f /s /q "%temp%*" >nul 2>&1
-del /f /s /q "C:\Windows\Temp*" >nul 2>&1
-
-:: Set Power Plan to High Performance
-echo [6/6] Setting power plan to High Performance...
-powercfg -setactive SCHEME_MIN >nul 2>&1
+echo Compressing Disk D...
+powershell -command "Compress-Archive -Path '%SOURCE%*' -DestinationPath '%DEST%%ZIPNAME%' -Force"
 
 echo.
 echo =========================================
-echo  OPTIMIZATION COMPLETE
-echo  RESTART PC FOR BEST RESULT
+echo   BACKUP COMPLETE
+echo   File saved to:
+echo   %DEST%%ZIPNAME%
 echo =========================================
 pause
 exit
